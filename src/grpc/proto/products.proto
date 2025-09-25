@@ -1,0 +1,33 @@
+syntax = "proto3";
+package products;
+
+service ProductsService {
+  rpc Create (CreateProductRequest) returns (Product) {}
+  rpc FindAll (ListProductsRequest) returns (ProductsList) {}
+  rpc FindOne (GetProductRequest) returns (Product) {}
+  rpc Update (UpdateProductRequest) returns (Product) {}
+  rpc Remove (GetProductRequest) returns (RemoveResponse) {}
+}
+
+message Product {
+  int32 id = 1;
+  string name = 2;
+  string price = 3;
+  string created_at = 4;
+  string updated_at = 5;
+}
+
+message CreateProductRequest { string name = 1; string price = 2; }
+message UpdateProductRequest { int32 id = 1; string name = 2; string price = 3; }
+message GetProductRequest { int32 id = 1; }
+message ListProductsRequest { int32 page = 1; int32 limit = 2; }
+
+message ProductsList {
+  repeated Product products = 1;
+  int32 total = 2;
+  int32 page = 3;
+  int32 limit = 4;
+  int32 pages = 5;
+}
+
+message RemoveResponse { bool success = 1; }

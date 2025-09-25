@@ -1,0 +1,49 @@
+syntax = "proto3";
+package orders;
+
+service OrdersService {
+  rpc Create (CreateOrderRequest) returns (Order) {}
+  rpc FindAll (ListOrdersRequest) returns (OrdersList) {}
+  rpc FindOne (GetOrderRequest) returns (Order) {}
+  rpc UpdateStatus (UpdateOrderStatusRequest) returns (Order) {}
+  rpc Remove (GetOrderRequest) returns (RemoveResponse) {}
+}
+
+enum OrderStatus {
+  CREATED = 0;
+  PAID = 1;
+  SHIPPED = 2;
+}
+
+message Order {
+  int32 id = 1;
+  int32 user_id = 2;
+  repeated int32 product_ids = 3;
+  string total_amount = 4;
+  OrderStatus status = 5;
+  string created_at = 6;
+  string updated_at = 7;
+}
+
+message CreateOrderRequest {
+  int32 user_id = 1;
+  repeated int32 product_ids = 2;
+}
+
+message UpdateOrderStatusRequest {
+  int32 id = 1;
+  OrderStatus status = 2;
+}
+
+message GetOrderRequest { int32 id = 1; }
+message ListOrdersRequest { int32 page = 1; int32 limit = 2; }
+
+message OrdersList {
+  repeated Order orders = 1;
+  int32 total = 2;
+  int32 page = 3;
+  int32 limit = 4;
+  int32 pages = 5;
+}
+
+message RemoveResponse { bool success = 1; }
