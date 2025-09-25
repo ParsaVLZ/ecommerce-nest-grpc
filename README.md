@@ -21,6 +21,15 @@ It provides CRUD operations for **Users**, **Products**, and **Orders** via both
 
 ---
 
+## NOTE: TypeORM Schema Sync
+
+For local development in this interview project, TypeORM is configured with **`synchronize: true`** to auto-create/update tables.
+
+> **We Do not use `synchronize: true` in production.**  
+> In production set **`synchronize: false`** and manage schema changes with **TypeORM migrations** to prevent accidental data loss.
+
+---
+
 ## Running the Project
 
 ### Prerequisites
