@@ -52,7 +52,7 @@ Services:
 ---
 
 
-## 🔌 gRPC — How to Test Manually (with `grpcurl`)
+## gRPC — How to Test Manually (with `grpcurl`)
 
 **Protos** are in: `src/grpc/proto/{users.proto, products.proto, orders.proto}`
 
