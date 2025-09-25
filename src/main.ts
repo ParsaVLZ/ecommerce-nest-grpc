@@ -14,13 +14,18 @@ async function bootstrap() {
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.GRPC,
     options: {
+      url: process.env.GRPC_URL || '0.0.0.0:50051',
       package: ['users', 'products', 'orders'],
       protoPath: [
         __dirname + '/grpc/proto/users.proto',
         __dirname + '/grpc/proto/products.proto',
         __dirname + '/grpc/proto/orders.proto',
       ],
-      url: process.env.GRPC_URL || '0.0.0.0:50051',
+      loader: {
+        keepCase: true,
+        defaults: true,
+        oneofs: true,
+      },
     },
   });
 
