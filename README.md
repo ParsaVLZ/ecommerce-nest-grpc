@@ -1,11 +1,11 @@
 # E-Commerce Backend (Interview Project)
 
-This project implements a simple e-commerce backend using **NestJS**, **TypeORM**, **MySQL**, and **gRPC**.  
+In This we implemented a simple e-commerce backend using **NestJS**, **TypeORM**, **MySQL**, and **gRPC**.  
 It provides CRUD operations for **Users**, **Products**, and **Orders** via both **REST** and **gRPC** APIs.
 
 ---
 
-## ✨ Features
+## Features
 
 - CRUD for **Users**, **Products**, and **Orders**
 - **Order creation logic**:
@@ -21,26 +21,7 @@ It provides CRUD operations for **Users**, **Products**, and **Orders** via both
 
 ---
 
-## 📂 Project Structure
-
-```
-src/
- ├── common/          # Shared utils, enums, base entities
- ├── modules/
- │   ├── users/       # User entity, service, REST + gRPC controllers
- │   ├── products/    # Product entity, service, REST + gRPC controllers
- │   └── orders/      # Order entity, service, REST + gRPC controllers
- └── main.ts          # App bootstrap (HTTP + gRPC)
-
-proto/
- ├── users.proto
- ├── products.proto
- └── orders.proto
-```
-
----
-
-## 🚀 Running the Project
+## Running the Project
 
 ### Prerequisites
 - Node.js v20+
@@ -52,13 +33,13 @@ proto/
 npm install
 
 # copy env file
-cp .env.example .env
+cp .env
 
 # start app
 npm run start:dev
 ```
 
-### With Docker Compose (recommended)
+### With Docker Compose
 ```bash
 docker-compose up --build
 ```
@@ -70,74 +51,133 @@ Services:
 
 ---
 
-## 🔧 Environment Variables
 
-Defined in `.env.example` and in `docker-compose.yml`.
+## 🔌 gRPC — How to Test Manually (with `grpcurl`)
 
-| Variable      | Default         | Description         |
-|---------------|-----------------|---------------------|
-| `NODE_ENV`    | development     | App environment     |
-| `PORT`        | 3000            | HTTP port           |
-| `GRPC_URL`    | 0.0.0.0:50051   | gRPC bind address   |
-| `DB_HOST`     | 127.0.0.1 / db  | Database host       |
-| `DB_PORT`     | 3306            | Database port       |
-| `DB_USERNAME` | root            | DB username         |
-| `DB_PASSWORD` | (empty)         | DB password         |
-| `DB_NAME`     | test_ecommerce  | Database name       |
+**Protos** are in: `src/grpc/proto/{users.proto, products.proto, orders.proto}`
 
----
+**Assumptions for the examples below**
+- Server is running at `localhost:50051`
+- You run commands from the project root
+- You have [`grpcurl`](https://github.com/fullstorydev/grpcurl) installed
+- Always include `-import-path src/grpc/proto` so grpcurl can resolve protos
 
-## 📘 REST API Examples
+> **Notes**
+> - In `products.proto`, the `price` field is a **string** (e.g., `"49.50"`); the server parses/validates it.
+> - The Orders gRPC controller accepts **both** snake_case (`user_id`, `product_ids`) and camelCase (`userId`, `productIds`) inputs.
 
-### Create a User
-```bash
-curl -X POST http://localhost:3000/users \
-  -H 'Content-Type: application/json' \
-  -d '{"name":"Parsa","email":"parsa@example.com"}'
-```
+### Users
 
-### Create a Product
-```bash
-curl -X POST http://localhost:3000/products \
-  -H 'Content-Type: application/json' \
-  -d '{"name":"Dress","price":14.22}'
-```
-
-### Create an Order
-```bash
-curl -X POST http://localhost:3000/orders \
-  -H 'Content-Type: application/json' \
-  -d '{"userId":1,"productIds":[1,1,2]}'
-```
-
-Swagger UI is available at **http://localhost:3000/api**.
-
----
-
-## 🎧 gRPC API Examples
-
-Using [`grpcurl`](https://github.com/fullstorydev/grpcurl):
-
-### Create a User
-```bash
-grpcurl -plaintext -import-path ./proto -proto users.proto \
-  -d '{"name":"Parsa","email":"parsa@example.com"}' \
+**Create**
+~~~bash
+grpcurl -plaintext -import-path src/grpc/proto -proto users.proto \
+  -d '{"name":"Parsa","email":"parsa@yahoo.com"}' \
   localhost:50051 users.UsersService/Create
-```
+~~~
 
-### Create a Product
-```bash
-grpcurl -plaintext -import-path ./proto -proto products.proto \
+**FindAll**
+~~~bash
+grpcurl -plaintext -import-path src/grpc/proto -proto users.proto \
+  -d '{"page":1,"limit":10}' \
+  localhost:50051 users.UsersService/FindAll
+~~~
+
+**FindOne**
+~~~bash
+grpcurl -plaintext -import-path src/grpc/proto -proto users.proto \
+  -d '{"id":1}' \
+  localhost:50051 users.UsersService/FindOne
+~~~
+
+**Update**
+~~~bash
+grpcurl -plaintext -import-path src/grpc/proto -proto users.proto \
+  -d '{"id":1,"name":"Parsa Renamed name"}' \
+  localhost:50051 users.UsersService/Update
+~~~
+
+**Remove**
+~~~bash
+grpcurl -plaintext -import-path src/grpc/proto -proto users.proto \
+  -d '{"id":1}' \
+  localhost:50051 users.UsersService/Remove
+~~~
+
+### Products
+
+**Create**
+~~~bash
+grpcurl -plaintext -import-path src/grpc/proto -proto products.proto \
   -d '{"name":"Dress","price":"14.22"}' \
   localhost:50051 products.ProductsService/Create
-```
+~~~
 
-### Create an Order
-```bash
-grpcurl -plaintext -import-path ./proto -proto orders.proto \
-  -d '{"user_id":1,"product_ids":[1,2]}' \
+**FindAll**
+~~~bash
+grpcurl -plaintext -import-path src/grpc/proto -proto products.proto \
+  -d '{"page":1,"limit":10}' \
+  localhost:50051 products.ProductsService/FindAll
+~~~
+
+**FindOne**
+~~~bash
+grpcurl -plaintext -import-path src/grpc/proto -proto products.proto \
+  -d '{"id":1}' \
+  localhost:50051 products.ProductsService/FindOne
+~~~
+
+**Update**
+~~~bash
+grpcurl -plaintext -import-path src/grpc/proto -proto products.proto \
+  -d '{"id":1,"price":"55.00"}' \
+  localhost:50051 products.ProductsService/Update
+~~~
+
+**Remove**
+~~~bash
+grpcurl -plaintext -import-path src/grpc/proto -proto products.proto \
+  -d '{"id":1}' \
+  localhost:50051 products.ProductsService/Remove
+~~~
+
+### Orders
+
+> **Precondition:** Create a **user** and **products** first; use their returned IDs below.
+
+**Create** (duplicates to test quantity calculation)
+~~~bash
+grpcurl -plaintext -import-path src/grpc/proto -proto orders.proto \
+  -d '{"user_id":1,"product_ids":[1,1,2]}' \
   localhost:50051 orders.OrdersService/Create
-```
+~~~
+
+**FindAll**
+~~~bash
+grpcurl -plaintext -import-path src/grpc/proto -proto orders.proto \
+  -d '{"page":1,"limit":10}' \
+  localhost:50051 orders.OrdersService/FindAll
+~~~
+
+**FindOne**
+~~~bash
+grpcurl -plaintext -import-path src/grpc/proto -proto orders.proto \
+  -d '{"id":1}' \
+  localhost:50051 orders.OrdersService/FindOne
+~~~
+
+**UpdateStatus** (`0=CREATED`, `1=PAID`, `2=SHIPPED`)
+~~~bash
+grpcurl -plaintext -import-path src/grpc/proto -proto orders.proto \
+  -d '{"id":1,"status":1}' \
+  localhost:50051 orders.OrdersService/UpdateStatus
+~~~
+
+**Remove**
+~~~bash
+grpcurl -plaintext -import-path src/grpc/proto -proto orders.proto \
+  -d '{"id":1}' \
+  localhost:50051 orders.OrdersService/Remove
+~~~
 
 ---
 
@@ -156,12 +196,3 @@ npm run test:e2e
 Covers:
 - **Unit**: UserService (duplicate email, pagination, CRUD logic)
 - **E2E**: Users REST endpoints with in-memory SQLite
-
----
-
-## 📜 Notes
-
-- REST and gRPC APIs are consistent with the `.proto` contracts.  
-- Errors use proper HTTP codes and NestJS exceptions (`404`, `409`, etc).  
-- MySQL 8 via Docker; e2e tests use SQLite in-memory for speed and isolation.  
-- Decimal values (`price`, `totalAmount`) handled with cent-safe arithmetic for accuracy.
